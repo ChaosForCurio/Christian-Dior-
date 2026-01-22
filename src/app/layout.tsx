@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Mulish, Bodoni_Moda } from "next/font/google";
-import SmoothScroll from "@/components/ui/SmoothScroll";
-import CustomCursor from "@/components/ui/CustomCursor";
+import SmoothScroll from "@/components/layout/SmoothScroll";
+import CustomCursor from "@/components/layout/CustomCursor";
+import GlobalErrorBoundary from "@/components/layout/ErrorBoundary";
 import "./globals.css";
 
 const mulish = Mulish({
@@ -29,10 +30,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${mulish.variable} ${bodoni.variable}`}>
       <body className="antialiased bg-stone-50 text-stone-900 selection:bg-stone-900 selection:text-white cursor-none">
-        <CustomCursor />
-        <SmoothScroll>
-          {children}
-        </SmoothScroll>
+        <GlobalErrorBoundary>
+          <CustomCursor />
+          <SmoothScroll>
+            {children}
+          </SmoothScroll>
+        </GlobalErrorBoundary>
       </body>
     </html>
   );

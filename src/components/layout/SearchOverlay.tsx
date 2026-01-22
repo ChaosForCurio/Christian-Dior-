@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search as SearchIcon, ArrowRight, Loader2 } from 'lucide-react';
 import { getProducts, Product } from '@/lib/serper';
-import Image from 'next/image';
 
 interface SearchOverlayProps {
     isOpen: boolean;

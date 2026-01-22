@@ -1,6 +1,6 @@
-import CategoryShowcase from "@/components/ui/CategoryShowcase";
-import Navbar from "@/components/ui/Navbar";
-import Footer from "@/components/ui/Footer";
+import CategoryShowcase from "@/components/sections/CategoryShowcase";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 export default function CouturePage() {
     return (

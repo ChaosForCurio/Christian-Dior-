@@ -1,5 +1,12 @@
 'use server';
 
+interface SerperShoppingItem {
+    title: string;
+    price: string;
+    imageUrl: string;
+    link: string;
+}
+
 export interface Product {
     title: string;
     price: string;
@@ -109,36 +116,55 @@ export const getProducts = async (query: string): Promise<Product[]> => {
 
     // Real API Call
     try {
-        console.log(`Fetching from Serper API for: Dior ${query}`);
+        console.log(`[API] Fetching products for: Dior ${query}`);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
         const response = await fetch('https://google.serper.dev/shopping', {
             method: 'POST',
             headers: {
                 'X-API-KEY': apiKey,
                 'Content-Type': 'application/json'
             },
+            signal: controller.signal,
             body: JSON.stringify({
                 q: `Dior ${query}`,
                 gl: 'us',
                 hl: 'en',
-                num: 6
-            })
+                num: 8
+            }),
+            cache: 'no-store' // Ensure fresh results
         });
 
-        if (!response.ok) throw new Error('Failed to fetch from Serper');
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(`Serper API failed: ${response.status} ${JSON.stringify(errorData)}`);
+        }
 
         const data = await response.json();
 
-        // Map Serper results to our Product interface
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return data.shopping.map((item: any) => ({
+        if (!data.shopping) {
+            console.warn(`[API] No shopping results for: ${query}`);
+            return [];
+        }
+
+        return data.shopping.map((item: SerperShoppingItem) => ({
             title: item.title,
             price: item.price,
             imageUrl: item.imageUrl,
             link: item.link
         }));
 
-    } catch (error) {
-        console.error('Serper API Error:', error);
+    } catch (error: unknown) {
+        const err = error as Error;
+        if (err.name === 'AbortError') {
+            console.error('[API] Fetch timed out');
+        } else {
+            console.error('[API] Serper error:', err.message);
+        }
         return [];
     }
 }

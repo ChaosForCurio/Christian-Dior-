@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ShoppingBag, Search, Menu } from 'lucide-react';
 import Logo from './Logo';
-import Dior3DLogo from './Dior3DLogo';
 import MenuOverlay from './MenuOverlay';
 import SearchOverlay from './SearchOverlay';
 
@@ -18,7 +17,7 @@ export default function Navbar() {
             <motion.nav
                 initial={{ y: -100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }}
                 className="fixed top-0 left-0 w-full z-50 px-6 py-6 md:px-12 flex justify-between items-center mix-blend-difference text-white"
             >
                 <div className="flex items-center gap-6">
@@ -37,8 +36,8 @@ export default function Navbar() {
                     </button>
                 </div>
 
-                <div className="absolute left-1/2 -track-1/2 -translate-x-1/2">
-                    <Dior3DLogo />
+                <div className="absolute left-1/2 -translate-x-1/2">
+                    <Logo />
                 </div>
 
                 <div className="flex items-center gap-6">

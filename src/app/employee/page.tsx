@@ -1,4 +1,4 @@
-import EmployeeOrders from "@/components/ui/EmployeeOrders";
+import EmployeeOrders from "@/components/features/employee/EmployeeOrders";
 
 export default function EmployeePage() {
     return (

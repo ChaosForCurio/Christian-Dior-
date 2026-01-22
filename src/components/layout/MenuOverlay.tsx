@@ -26,16 +26,16 @@ export default function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
             opacity: 0,
             transition: {
                 duration: 0.6,
-                ease: [0.16, 1, 0.3, 1],
-                when: "afterChildren"
+                ease: [0.16, 1, 0.3, 1] as const,
+                when: "afterChildren" as const
             }
         },
         open: {
             opacity: 1,
             transition: {
                 duration: 0.6,
-                ease: [0.16, 1, 0.3, 1],
-                when: "beforeChildren"
+                ease: [0.16, 1, 0.3, 1] as const,
+                when: "beforeChildren" as const
             }
         }
     };
@@ -45,14 +45,14 @@ export default function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
             scaleY: 0,
             transition: {
                 duration: 0.8,
-                ease: [0.16, 1, 0.3, 1]
+                ease: [0.16, 1, 0.3, 1] as const
             }
         },
         open: {
             scaleY: 1,
             transition: {
                 duration: 0.8,
-                ease: [0.16, 1, 0.3, 1]
+                ease: [0.16, 1, 0.3, 1] as const
             }
         }
     };
@@ -65,7 +65,7 @@ export default function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
             transition: {
                 delay: 0.1 + i * 0.08,
                 duration: 0.8,
-                ease: [0.16, 1, 0.3, 1]
+                ease: [0.16, 1, 0.3, 1] as const
             }
         })
     };

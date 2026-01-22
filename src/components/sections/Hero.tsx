@@ -23,7 +23,7 @@ export default function Hero() {
                     <motion.h1
                         initial={{ y: "100%" }}
                         animate={{ y: 0 }}
-                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] as const }}
                         className="font-serif text-[15vw] leading-[0.9] text-stone-900 tracking-tighter"
                     >
                         DIOR
