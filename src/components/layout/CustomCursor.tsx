@@ -5,12 +5,17 @@ import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 export default function CustomCursor() {
     const [isVisible, setIsVisible] = useState(false);
+    const [isTouch, setIsTouch] = useState(false);
     const cursorX = useMotionValue(-100);
     const cursorY = useMotionValue(-100);
 
     const springConfig = { damping: 25, stiffness: 700 };
     const cursorXSpring = useSpring(cursorX, springConfig);
     const cursorYSpring = useSpring(cursorY, springConfig);
+
+    useEffect(() => {
+        setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    }, []);
 
     useEffect(() => {
         const moveCursor = (e: MouseEvent) => {
@@ -42,7 +47,7 @@ export default function CustomCursor() {
                 style={{
                     translateX: cursorXSpring,
                     translateY: cursorYSpring,
-                    opacity: isVisible ? 1 : 0
+                    opacity: isVisible && !isTouch ? 1 : 0
                 }}
             />
             <motion.div

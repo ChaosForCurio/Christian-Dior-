@@ -75,14 +75,20 @@ export default function ProductShowcase() {
                                 transition={{ duration: 0.5 }}
                                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12"
                             >
-                                {products.map((product, idx) => (
-                                    <ProductCard
-                                        key={product.title}
-                                        product={product}
-                                        index={idx}
-                                        onQuickView={openQuickView}
-                                    />
-                                ))}
+                                {products.length > 0 ? (
+                                    products.map((product, idx) => (
+                                        <ProductCard
+                                            key={`${product.title}-${idx}`}
+                                            product={product}
+                                            index={idx}
+                                            onQuickView={openQuickView}
+                                        />
+                                    ))
+                                ) : (
+                                    <div className="col-span-full text-center py-24">
+                                        <p className="text-stone-400 font-serif italic text-lg">No products found in this category.</p>
+                                    </div>
+                                )}
                             </motion.div>
                         )}
                     </AnimatePresence>

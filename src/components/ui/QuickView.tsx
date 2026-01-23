@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { useStore } from '@/lib/store-context';
 import { cn } from '@/lib/utils';
+import { ReactLenis } from 'lenis/react';
 
 interface QuickViewProps {
     product: Product | null;
@@ -70,100 +71,106 @@ export default function QuickView({ product, isOpen, onClose }: QuickViewProps) 
                             />
                         </div>
 
-                        {/* Info Section */}
-                        <div className="w-full md:w-[400px] p-8 md:p-12 flex flex-col overflow-y-auto">
-                            <div className="mb-auto">
-                                <motion.span
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.2 }}
-                                    className="text-[10px] uppercase tracking-[0.4em] text-stone-400 mb-4 block"
-                                >
-                                    New Collection
-                                </motion.span>
-
-                                <motion.h2
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.3 }}
-                                    className="font-serif text-3xl md:text-4xl text-stone-900 mb-6 leading-tight"
-                                >
-                                    {product.title}
-                                </motion.h2>
-
-                                <motion.p
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.4 }}
-                                    className="text-xl text-stone-600 font-serif italic mb-8"
-                                >
-                                    {product.price}
-                                </motion.p>
-
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.5 }}
-                                    className="space-y-6 mb-12"
-                                >
-                                    <p className="text-sm text-stone-500 leading-relaxed uppercase tracking-wider">
-                                        Experience the exceptional craftsmanship of the Dior universe. This piece represents the House's heritage and constant search for perfection.
-                                    </p>
-
-                                    <div className="flex gap-4">
-                                        <div className="flex flex-col gap-1">
-                                            <span className="text-[10px] uppercase tracking-widest text-stone-300">Reference</span>
-                                            <span className="text-xs font-mono">DR-2026-FSH</span>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            </div>
-
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.6 }}
-                                className="space-y-4"
+                        <div className="w-full md:w-[400px] bg-white relative">
+                            <ReactLenis
+                                options={{ wheelMultiplier: 0.8, duration: 1.2 }}
+                                className="h-full overflow-y-auto p-8 md:p-12 scrollbar-hide"
                             >
-                                <button
-                                    onClick={() => {
-                                        addToCart(product);
-                                        onClose();
-                                    }}
-                                    className="w-full bg-stone-900 text-white py-4 flex items-center justify-center gap-3 group hover:bg-stone-800 transition-colors uppercase text-xs tracking-[0.2em]"
-                                >
-                                    <ShoppingBag size={16} />
-                                    Add to Bag
-                                </button>
+                                <div className="flex flex-col min-h-full">
+                                    <div className="mb-auto">
+                                        <motion.span
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: 0.2 }}
+                                            className="text-[10px] uppercase tracking-[0.4em] text-stone-400 mb-4 block"
+                                        >
+                                            New Collection
+                                        </motion.span>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <button
-                                        onClick={() => addToWishlist(product)}
-                                        className={cn(
-                                            "flex-1 border py-3 flex items-center justify-center gap-2 transition-all uppercase text-[10px] tracking-widest",
-                                            isInWishlist(product.title)
-                                                ? "bg-stone-900 text-white border-stone-900"
-                                                : "border-stone-200 text-stone-600 hover:bg-stone-50"
-                                        )}
+                                        <motion.h2
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.3 }}
+                                            className="font-serif text-3xl md:text-4xl text-stone-900 mb-6 leading-tight"
+                                        >
+                                            {product.title}
+                                        </motion.h2>
+
+                                        <motion.p
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.4 }}
+                                            className="text-xl text-stone-600 font-serif italic mb-8"
+                                        >
+                                            {product.price}
+                                        </motion.p>
+
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.5 }}
+                                            className="space-y-6 mb-12"
+                                        >
+                                            <p className="text-sm text-stone-500 leading-relaxed uppercase tracking-wider">
+                                                Experience the exceptional craftsmanship of the Dior universe. This piece represents the House's heritage and constant search for perfection.
+                                            </p>
+
+                                            <div className="flex gap-4">
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-[10px] uppercase tracking-widest text-stone-300">Reference</span>
+                                                    <span className="text-xs font-mono">DR-2026-FSH</span>
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    </div>
+
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.6 }}
+                                        className="space-y-4"
                                     >
-                                        <Heart size={14} className={isInWishlist(product.title) ? "fill-white" : ""} />
-                                        {isInWishlist(product.title) ? "Wishlisted" : "Wishlist"}
-                                    </button>
-                                    <button className="flex-1 border border-stone-200 py-3 flex items-center justify-center gap-2 hover:bg-stone-50 transition-colors uppercase text-[10px] tracking-widest text-stone-600">
-                                        <Share2 size={14} />
-                                        Share
-                                    </button>
-                                </div>
+                                        <button
+                                            onClick={() => {
+                                                addToCart(product);
+                                                onClose();
+                                            }}
+                                            className="w-full bg-stone-900 text-white py-4 flex items-center justify-center gap-3 group hover:bg-stone-800 transition-colors uppercase text-xs tracking-[0.2em]"
+                                        >
+                                            <ShoppingBag size={16} />
+                                            Add to Bag
+                                        </button>
 
-                                <Link
-                                    href={product.link}
-                                    target="_blank"
-                                    className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.3em] text-stone-400 hover:text-stone-900 transition-colors pt-4 group"
-                                >
-                                    View Full Details
-                                    <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
-                                </Link>
-                            </motion.div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button
+                                                onClick={() => addToWishlist(product)}
+                                                className={cn(
+                                                    "flex-1 border py-3 flex items-center justify-center gap-2 transition-all uppercase text-[10px] tracking-widest",
+                                                    isInWishlist(product.title)
+                                                        ? "bg-stone-900 text-white border-stone-900"
+                                                        : "border-stone-200 text-stone-600 hover:bg-stone-50"
+                                                )}
+                                            >
+                                                <Heart size={14} className={isInWishlist(product.title) ? "fill-white" : ""} />
+                                                {isInWishlist(product.title) ? "Wishlisted" : "Wishlist"}
+                                            </button>
+                                            <button className="flex-1 border border-stone-200 py-3 flex items-center justify-center gap-2 hover:bg-stone-50 transition-colors uppercase text-[10px] tracking-widest text-stone-600">
+                                                <Share2 size={14} />
+                                                Share
+                                            </button>
+                                        </div>
+
+                                        <Link
+                                            href={product.link}
+                                            target="_blank"
+                                            className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.3em] text-stone-400 hover:text-stone-900 transition-colors pt-4 group"
+                                        >
+                                            View Full Details
+                                            <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                                        </Link>
+                                    </motion.div>
+                                </div>
+                            </ReactLenis>
                         </div>
                     </motion.div>
                 </div>

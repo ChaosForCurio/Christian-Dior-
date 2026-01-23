@@ -140,14 +140,14 @@ export const getProducts = async (query: string): Promise<Product[]> => {
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(`Serper API failed: ${response.status} ${JSON.stringify(errorData)}`);
+            const errorBody = await response.text();
+            throw new Error(`Serper API returned ${response.status}: ${errorBody}`);
         }
 
         const data = await response.json();
 
-        if (!data.shopping) {
-            console.warn(`[API] No shopping results for: ${query}`);
+        if (!data || !data.shopping) {
+            console.warn(`[Serper] No results found for: ${query}`);
             return [];
         }
 
@@ -158,12 +158,11 @@ export const getProducts = async (query: string): Promise<Product[]> => {
             link: item.link
         }));
 
-    } catch (error: unknown) {
-        const err = error as Error;
-        if (err.name === 'AbortError') {
-            console.error('[API] Fetch timed out');
+    } catch (error: any) {
+        if (error.name === 'AbortError') {
+            console.error('[Serper] Request timed out for:', query);
         } else {
-            console.error('[API] Serper error:', err.message);
+            console.error('[Serper] Fetch error:', error instanceof Error ? error.message : String(error));
         }
         return [];
     }
