@@ -1,3 +1,3 @@
 ## Dior
 
-<img src="/image/diorr.png" alt="Dior" width="100" height="100">
+<img src="/image/diorr.png" alt="Dior" width="400" height="400">
