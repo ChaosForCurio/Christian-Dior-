@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search as SearchIcon, ArrowRight, Loader2 } from 'lucide-react';
 import { getProducts, Product } from '@/lib/serper';
+import QuickView from '@/components/ui/QuickView';
 
 interface SearchOverlayProps {
     isOpen: boolean;
@@ -14,6 +15,13 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+
+    const openQuickView = (product: Product) => {
+        setSelectedProduct(product);
+        setIsQuickViewOpen(true);
+    };
 
     const handleSearch = useCallback(async (searchQuery: string) => {
         if (!searchQuery.trim()) {
@@ -80,11 +88,12 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                             <AnimatePresence>
                                 {results.map((product, idx) => (
                                     <motion.div
-                                        key={product.link}
+                                        key={product.link + idx}
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.1 }}
                                         className="group cursor-pointer"
+                                        onClick={() => openQuickView(product)}
                                     >
                                         <div className="relative aspect-[4/5] bg-stone-50 mb-6 overflow-hidden">
                                             <img
@@ -136,6 +145,12 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                             </div>
                         )}
                     </div>
+
+                    <QuickView
+                        product={selectedProduct}
+                        isOpen={isQuickViewOpen}
+                        onClose={() => setIsQuickViewOpen(false)}
+                    />
                 </motion.div>
             )}
         </AnimatePresence>

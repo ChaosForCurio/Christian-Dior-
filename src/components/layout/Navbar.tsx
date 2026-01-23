@@ -3,14 +3,20 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ShoppingBag, Search, Menu } from 'lucide-react';
+import { ShoppingBag, Search, Menu, Heart } from 'lucide-react';
 import Logo from './Logo';
 import MenuOverlay from './MenuOverlay';
 import SearchOverlay from './SearchOverlay';
+import BagOverlay from './BagOverlay';
+import WishlistOverlay from './WishlistOverlay';
+import { useStore } from '@/lib/store-context';
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isBagOpen, setIsBagOpen] = useState(false);
+    const [isWishlistOpen, setIsWishlistOpen] = useState(false);
+    const { cart, wishlist } = useStore();
 
     return (
         <>
@@ -51,14 +57,33 @@ export default function Navbar() {
                     >
                         <Search size={20} />
                     </button>
-                    <button className="hover:opacity-70 transition-opacity">
+                    <button
+                        onClick={() => setIsWishlistOpen(true)}
+                        className="hover:opacity-70 transition-opacity relative"
+                    >
+                        <Heart size={20} />
+                        {wishlist.length > 0 && (
+                            <span className="absolute -top-1 -right-1 w-2 h-2 bg-white rounded-full" />
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setIsBagOpen(true)}
+                        className="hover:opacity-70 transition-opacity relative"
+                    >
                         <ShoppingBag size={20} />
+                        {cart.length > 0 && (
+                            <span className="absolute -top-2 -right-2 text-[10px] font-medium bg-white text-black w-4 h-4 rounded-full flex items-center justify-center">
+                                {cart.length}
+                            </span>
+                        )}
                     </button>
                 </div>
             </motion.nav>
 
             <MenuOverlay isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
             <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+            <BagOverlay isOpen={isBagOpen} onClose={() => setIsBagOpen(false)} />
+            <WishlistOverlay isOpen={isWishlistOpen} onClose={() => setIsWishlistOpen(false)} />
         </>
     );
 }

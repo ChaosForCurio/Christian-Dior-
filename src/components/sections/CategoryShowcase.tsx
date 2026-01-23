@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getProducts, Product } from '@/lib/serper';
 import ProductCard from '@/components/ui/ProductCard';
+import QuickView from '@/components/ui/QuickView';
 import { Loader2 } from 'lucide-react';
 
 interface CategoryShowcaseProps {
@@ -14,6 +15,13 @@ interface CategoryShowcaseProps {
 export default function CategoryShowcase({ category, description }: CategoryShowcaseProps) {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+
+    const openQuickView = (product: Product) => {
+        setSelectedProduct(product);
+        setIsQuickViewOpen(true);
+    };
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -61,13 +69,24 @@ export default function CategoryShowcase({ category, description }: CategoryShow
                                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20"
                             >
                                 {products.map((product, idx) => (
-                                    <ProductCard key={product.title + idx} product={product} index={idx} />
+                                    <ProductCard
+                                        key={product.title + idx}
+                                        product={product}
+                                        index={idx}
+                                        onQuickView={openQuickView}
+                                    />
                                 ))}
                             </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
             </div>
+
+            <QuickView
+                product={selectedProduct}
+                isOpen={isQuickViewOpen}
+                onClose={() => setIsQuickViewOpen(false)}
+            />
         </section>
     );
 }
