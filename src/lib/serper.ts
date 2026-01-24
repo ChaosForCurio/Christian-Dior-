@@ -116,10 +116,8 @@ export const getProducts = async (query: string): Promise<Product[]> => {
 
     // Real API Call
     try {
-        console.log(`[API] Fetching products for: Dior ${query}`);
-
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+        const timeoutId = setTimeout(() => controller.abort(), 12000); // Increased timeout to 12s
 
         const response = await fetch('https://google.serper.dev/shopping', {
             method: 'POST',
@@ -134,20 +132,19 @@ export const getProducts = async (query: string): Promise<Product[]> => {
                 hl: 'en',
                 num: 8
             }),
-            cache: 'no-store' // Ensure fresh results
+            next: { revalidate: 3600 } // Cache results for 1 hour
         });
 
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-            const errorBody = await response.text();
-            throw new Error(`Serper API returned ${response.status}: ${errorBody}`);
+            const errorText = await response.text();
+            throw new Error(`Maison.API_ERROR: ${response.status} - ${errorText.substring(0, 100)}`);
         }
 
         const data = await response.json();
 
         if (!data || !data.shopping) {
-            console.warn(`[Serper] No results found for: ${query}`);
             return [];
         }
 
@@ -158,12 +155,17 @@ export const getProducts = async (query: string): Promise<Product[]> => {
             link: item.link
         }));
 
-    } catch (error: any) {
-        if (error.name === 'AbortError') {
-            console.error('[Serper] Request timed out for:', query);
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorName = error instanceof Error ? error.name : 'UnknownError';
+
+        if (errorName === 'AbortError') {
+            console.error('Maison.TIMEOUT: Serper API request timed out for query:', query);
         } else {
-            console.error('[Serper] Fetch error:', error instanceof Error ? error.message : String(error));
+            console.error('Maison.EXCEPTION:', errorMessage);
         }
+
+        // Final fallback: Return empty or attempt one last mock if query matches categories
         return [];
     }
 }

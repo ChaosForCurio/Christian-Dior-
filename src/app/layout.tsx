@@ -4,6 +4,8 @@ import SmoothScroll from "@/components/layout/SmoothScroll";
 import CustomCursor from "@/components/layout/CustomCursor";
 import GlobalErrorBoundary from "@/components/layout/ErrorBoundary";
 import { StoreProvider } from "@/lib/store-context";
+import { StackProvider, StackTheme } from "@stackframe/stack";
+import { stackServerApp } from "@/lib/stack";
 import "./globals.css";
 
 const mulish = Mulish({
@@ -31,14 +33,18 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${mulish.variable} ${bodoni.variable}`}>
       <body className="antialiased bg-stone-50 text-stone-900 selection:bg-stone-900 selection:text-white cursor-none">
-        <GlobalErrorBoundary>
-          <StoreProvider>
-            <CustomCursor />
-            <SmoothScroll>
-              {children}
-            </SmoothScroll>
-          </StoreProvider>
-        </GlobalErrorBoundary>
+        <StackProvider app={stackServerApp}>
+          <StackTheme>
+            <GlobalErrorBoundary>
+              <StoreProvider>
+                <CustomCursor />
+                <SmoothScroll>
+                  {children}
+                </SmoothScroll>
+              </StoreProvider>
+            </GlobalErrorBoundary>
+          </StackTheme>
+        </StackProvider>
       </body>
     </html>
   );

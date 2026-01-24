@@ -14,7 +14,12 @@ export default function CustomCursor() {
     const cursorYSpring = useSpring(cursorY, springConfig);
 
     useEffect(() => {
-        setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
+        const updateIsTouch = () => {
+            setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
+        };
+        updateIsTouch();
+        window.addEventListener('resize', updateIsTouch);
+        return () => window.removeEventListener('resize', updateIsTouch);
     }, []);
 
     useEffect(() => {
@@ -22,8 +27,12 @@ export default function CustomCursor() {
             cursorX.set(e.clientX - 16);
             cursorY.set(e.clientY - 16);
 
-            // Show only when moving mouse inside window
-            if (!isVisible) setIsVisible(true);
+            // We can check visibility here without triggering re-renders if we don't depend on isVisible
+            // But we need to set state. 
+            // Better: just let the mouseenter/leave handle visibility for the most part,
+            // or use a ref for isVisible to avoid effect re-run, but state is needed for render.
+            // However, setting state to true when already true is a no-op in React.
+            setIsVisible(true);
         };
 
         const handleMouseEnter = () => setIsVisible(true);
@@ -38,7 +47,7 @@ export default function CustomCursor() {
             document.body.removeEventListener('mouseenter', handleMouseEnter);
             document.body.removeEventListener('mouseleave', handleMouseLeave);
         };
-    }, [cursorX, cursorY, isVisible]);
+    }, [cursorX, cursorY]); // Removed isVisible from dependency to avoid churn
 
     return (
         <>

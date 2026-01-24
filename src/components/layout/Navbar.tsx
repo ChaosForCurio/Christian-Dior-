@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ShoppingBag, Search, Menu, Heart } from 'lucide-react';
+import { ShoppingBag, Search, Menu, Heart, User } from 'lucide-react';
+import { useUser } from "@stackframe/stack";
 import Logo from './Logo';
 import MenuOverlay from './MenuOverlay';
 import SearchOverlay from './SearchOverlay';
@@ -17,6 +18,7 @@ export default function Navbar() {
     const [isBagOpen, setIsBagOpen] = useState(false);
     const [isWishlistOpen, setIsWishlistOpen] = useState(false);
     const { cart, wishlist } = useStore();
+    const user = useUser();
 
     return (
         <>
@@ -57,6 +59,22 @@ export default function Navbar() {
                     >
                         <Search size={20} />
                     </button>
+                    <Link
+                        href={user ? "/account" : "/sign-in"}
+                        className="hover:opacity-70 transition-opacity"
+                    >
+                        {user?.profileImageUrl ? (
+                            <div className="w-5 h-5 rounded-full overflow-hidden border border-white/50">
+                                <img
+                                    src={user.profileImageUrl}
+                                    alt={user.displayName || "Profile"}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        ) : (
+                            <User size={20} />
+                        )}
+                    </Link>
                     <button
                         onClick={() => setIsWishlistOpen(true)}
                         className="hover:opacity-70 transition-opacity relative"

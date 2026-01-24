@@ -24,41 +24,46 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
     // Load from localStorage on mount
     useEffect(() => {
-        try {
-            const savedCart = localStorage.getItem('dior-cart');
-            const savedWishlist = localStorage.getItem('dior-wishlist');
+        const restoreState = () => {
+            try {
+                const savedCart = localStorage.getItem('dior-cart');
+                const savedWishlist = localStorage.getItem('dior-wishlist');
 
-            if (savedCart) {
-                const parsed = JSON.parse(savedCart);
-                if (Array.isArray(parsed)) setCart(parsed);
-            }
+                if (savedCart) {
+                    const parsed = JSON.parse(savedCart) as unknown;
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        setCart(parsed as Product[]);
+                    }
+                }
 
-            if (savedWishlist) {
-                const parsed = JSON.parse(savedWishlist);
-                if (Array.isArray(parsed)) setWishlist(parsed);
+                if (savedWishlist) {
+                    const parsed = JSON.parse(savedWishlist) as unknown;
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        setWishlist(parsed as Product[]);
+                    }
+                }
+            } catch (error: unknown) {
+                console.error('[Store] Restore Exception:', error instanceof Error ? error.message : String(error));
             }
-        } catch (error) {
-            console.error('[Store] Failed to load from localStorage:', error);
-            // Clear corrupted data
-            localStorage.removeItem('dior-cart');
-            localStorage.removeItem('dior-wishlist');
-        }
+        };
+
+        restoreState();
     }, []);
 
     // Save to localStorage on change
     useEffect(() => {
         try {
             localStorage.setItem('dior-cart', JSON.stringify(cart));
-        } catch (error) {
-            console.error('[Store] Failed to save cart:', error);
+        } catch (error: unknown) {
+            console.error('[Store] Failed to save cart:', error instanceof Error ? error.message : String(error));
         }
     }, [cart]);
 
     useEffect(() => {
         try {
             localStorage.setItem('dior-wishlist', JSON.stringify(wishlist));
-        } catch (error) {
-            console.error('[Store] Failed to save wishlist:', error);
+        } catch (error: unknown) {
+            console.error('[Store] Failed to save wishlist:', error instanceof Error ? error.message : String(error));
         }
     }, [wishlist]);
 
@@ -88,7 +93,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const clearWishlist = () => setWishlist([]);
 
     const totalPrice = cart.reduce((total, item) => {
-        const priceNum = parseFloat(item.price.replace(/[$,]/g, '')) || 0;
+        // Remove non-numeric characters except decimal point
+        const cleanPrice = item.price.replace(/[^0-9.]/g, '');
+        const priceNum = parseFloat(cleanPrice) || 0;
         return total + priceNum;
     }, 0);
 

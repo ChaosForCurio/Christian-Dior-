@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useStore } from '@/lib/store-context';
@@ -102,10 +103,10 @@ export default function BagOverlay({ isOpen, onClose }: BagOverlayProps) {
                                     <span className="text-[10px] uppercase tracking-[0.3em] text-stone-400">Total (Excl. Tax)</span>
                                     <span className="text-xl font-serif">${totalPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                                 </div>
-                                <button className="w-full bg-stone-900 text-white py-5 flex items-center justify-center gap-3 group hover:bg-stone-800 transition-colors uppercase text-[10px] tracking-[0.3em]">
+                                <Link href="/checkout" onClick={onClose} className="w-full bg-stone-900 text-white py-5 flex items-center justify-center gap-3 group hover:bg-stone-800 transition-colors uppercase text-[10px] tracking-[0.3em]">
                                     Checkout Now
                                     <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                                </button>
+                                </Link>
                                 <p className="text-[10px] text-center text-stone-400 mt-6 uppercase tracking-widest">
                                     Free shipping on all orders over $500
                                 </p>
