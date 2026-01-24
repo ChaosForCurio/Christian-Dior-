@@ -1,9 +1,11 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, ShoppingBag, Trash2 } from 'lucide-react';
+import { X, Heart, ShoppingBag, Trash2, Loader2, Check } from 'lucide-react';
 import { useStore } from '@/lib/store-context';
+import { useState } from 'react';
 import { ReactLenis } from 'lenis/react';
+import { cn } from '@/lib/utils';
 
 interface WishlistOverlayProps {
     isOpen: boolean;
@@ -12,6 +14,22 @@ interface WishlistOverlayProps {
 
 export default function WishlistOverlay({ isOpen, onClose }: WishlistOverlayProps) {
     const { wishlist, removeFromWishlist, addToCart, clearWishlist } = useStore();
+    const [actioningItem, setActioningItem] = useState<{ title: string, type: 'remove' | 'add' } | null>(null);
+
+    const handleAction = async (title: string, type: 'remove' | 'add', item?: any) => {
+        setActioningItem({ title, type });
+
+        await new Promise(resolve => setTimeout(resolve, 600));
+
+        if (type === 'remove') {
+            removeFromWishlist(title);
+        } else if (item) {
+            addToCart(item);
+            removeFromWishlist(title);
+        }
+
+        setActioningItem(null);
+    };
 
     return (
         <AnimatePresence>
@@ -63,42 +81,67 @@ export default function WishlistOverlay({ isOpen, onClose }: WishlistOverlayProp
                                         </button>
                                     </div>
                                 ) : (
-                                    wishlist.map((item, idx) => (
-                                        <motion.div
-                                            key={`${item.title}-${idx}`}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: idx * 0.1 }}
-                                            className="flex gap-6 group"
-                                        >
-                                            <div className="w-24 aspect-[3/4] bg-stone-50 overflow-hidden">
-                                                <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
-                                            </div>
-                                            <div className="flex-1 flex flex-col py-1">
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <h3 className="text-xs uppercase tracking-widest font-medium max-w-[150px]">{item.title}</h3>
+                                    <AnimatePresence mode="popLayout">
+                                        {wishlist.map((item, idx) => (
+                                            <motion.div
+                                                key={`${item.title}-${idx}`}
+                                                layout
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{
+                                                    opacity: actioningItem?.title === item.title ? 0.6 : 1,
+                                                    x: 0
+                                                }}
+                                                exit={{ opacity: 0, x: 50 }}
+                                                transition={{ delay: idx * 0.05 }}
+                                                className="flex gap-6 group"
+                                            >
+                                                <div className="w-24 aspect-[3/4] bg-stone-50 overflow-hidden relative">
+                                                    <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                                                    {actioningItem?.title === item.title && (
+                                                        <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] flex items-center justify-center">
+                                                            <Loader2 size={16} className="animate-spin text-stone-900" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 flex flex-col py-1">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <h3 className="text-xs uppercase tracking-widest font-medium max-w-[150px]">{item.title}</h3>
+                                                        <button
+                                                            disabled={!!actioningItem}
+                                                            onClick={() => handleAction(item.title, 'remove')}
+                                                            className="text-stone-300 hover:text-stone-900 transition-colors disabled:opacity-0"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-stone-500 font-serif italic text-sm mb-6">{item.price}</p>
+
                                                     <button
-                                                        onClick={() => removeFromWishlist(item.title)}
-                                                        className="text-stone-300 hover:text-stone-900 transition-colors"
+                                                        disabled={!!actioningItem}
+                                                        onClick={() => handleAction(item.title, 'add', item)}
+                                                        className={cn(
+                                                            "mt-auto w-full border py-3 text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2",
+                                                            actioningItem?.title === item.title && actioningItem.type === 'add'
+                                                                ? "bg-stone-100 border-transparent text-stone-400"
+                                                                : "border-stone-200 hover:bg-stone-900 hover:text-white hover:border-stone-900"
+                                                        )}
                                                     >
-                                                        <Trash2 size={16} />
+                                                        {actioningItem?.title === item.title && actioningItem.type === 'add' ? (
+                                                            <>
+                                                                <Check size={14} />
+                                                                Adding...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <ShoppingBag size={14} />
+                                                                Add to Bag
+                                                            </>
+                                                        )}
                                                     </button>
                                                 </div>
-                                                <p className="text-stone-500 font-serif italic text-sm mb-6">{item.price}</p>
-
-                                                <button
-                                                    onClick={() => {
-                                                        addToCart(item);
-                                                        removeFromWishlist(item.title);
-                                                    }}
-                                                    className="mt-auto w-full border border-stone-200 py-3 text-[10px] uppercase tracking-widest hover:bg-stone-900 hover:text-white hover:border-stone-900 transition-all flex items-center justify-center gap-2"
-                                                >
-                                                    <ShoppingBag size={14} />
-                                                    Add to Bag
-                                                </button>
-                                            </div>
-                                        </motion.div>
-                                    ))
+                                            </motion.div>
+                                        ))}
+                                    </AnimatePresence>
                                 )}
                             </div>
                         </ReactLenis>

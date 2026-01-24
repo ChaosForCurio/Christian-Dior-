@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
+import { X, Trash2, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react';
 import { useStore } from '@/lib/store-context';
-import { Product } from '@/lib/serper';
+import { useState } from 'react';
 import { ReactLenis } from 'lenis/react';
 
 interface BagOverlayProps {
@@ -14,6 +14,15 @@ interface BagOverlayProps {
 
 export default function BagOverlay({ isOpen, onClose }: BagOverlayProps) {
     const { cart, removeFromCart, totalPrice, clearCart } = useStore();
+    const [removingItem, setRemovingItem] = useState<string | null>(null);
+
+    const handleRemove = (title: string) => {
+        setRemovingItem(title);
+        setTimeout(() => {
+            removeFromCart(title);
+            setRemovingItem(null);
+        }, 500);
+    };
 
     return (
         <AnimatePresence>
@@ -65,34 +74,49 @@ export default function BagOverlay({ isOpen, onClose }: BagOverlayProps) {
                                         </button>
                                     </div>
                                 ) : (
-                                    cart.map((item, idx) => (
-                                        <motion.div
-                                            key={`${item.title}-${idx}`}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: idx * 0.1 }}
-                                            className="flex gap-6 group"
-                                        >
-                                            <div className="w-24 aspect-[3/4] bg-stone-50 overflow-hidden">
-                                                <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
-                                            </div>
-                                            <div className="flex-1 flex flex-col py-1">
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <h3 className="text-xs uppercase tracking-widest font-medium max-w-[150px]">{item.title}</h3>
-                                                    <button
-                                                        onClick={() => removeFromCart(item.title)}
-                                                        className="text-stone-300 hover:text-stone-900 transition-colors"
-                                                    >
-                                                        <Trash2 size={16} />
-                                                    </button>
+                                    <AnimatePresence mode="popLayout">
+                                        {cart.map((item, idx) => (
+                                            <motion.div
+                                                key={`${item.title}-${idx}`}
+                                                layout
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{
+                                                    opacity: removingItem === item.title ? 0.5 : 1,
+                                                    x: 0,
+                                                    scale: removingItem === item.title ? 0.98 : 1
+                                                }}
+                                                exit={{ opacity: 0, x: 50, transition: { duration: 0.3 } }}
+                                                className="flex gap-6 group relative"
+                                            >
+                                                <div className="w-24 aspect-[3/4] bg-stone-50 overflow-hidden relative">
+                                                    <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                                                    {removingItem === item.title && (
+                                                        <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center">
+                                                            <Loader2 size={16} className="animate-spin text-stone-900" />
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <p className="text-stone-500 font-serif italic text-sm mb-4">{item.price}</p>
-                                                <div className="mt-auto">
-                                                    <span className="text-[10px] uppercase tracking-widest text-stone-300">Quantity: 1</span>
+                                                <div className="flex-1 flex flex-col py-1">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <h3 className="text-xs uppercase tracking-widest font-medium max-w-[150px]">{item.title}</h3>
+                                                        <button
+                                                            disabled={removingItem === item.title}
+                                                            onClick={() => handleRemove(item.title)}
+                                                            className="text-stone-300 hover:text-stone-900 transition-colors disabled:opacity-0"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-stone-500 font-serif italic text-sm mb-4">{item.price}</p>
+                                                    <div className="mt-auto">
+                                                        <span className="text-[10px] uppercase tracking-widest text-stone-300">
+                                                            {removingItem === item.title ? "Removing..." : "Quantity: 1"}
+                                                        </span>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </motion.div>
-                                    ))
+                                            </motion.div>
+                                        ))}
+                                    </AnimatePresence>
                                 )}
                             </div>
                         </ReactLenis>
