@@ -17,6 +17,7 @@ interface QuickViewProps {
 export default function QuickView({ product, isOpen, onClose }: QuickViewProps) {
     const { addToCart, addToWishlist, isInWishlist } = useStore();
     const [isImageLoaded, setIsImageLoaded] = useState(false);
+    const [isAdded, setIsAdded] = useState(false);
 
     // Prevent scroll when modal is open
     useEffect(() => {
@@ -24,6 +25,7 @@ export default function QuickView({ product, isOpen, onClose }: QuickViewProps) 
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'unset';
+            setIsAdded(false); // Reset feedback on close
         }
         return () => {
             document.body.style.overflow = 'unset';
@@ -31,6 +33,14 @@ export default function QuickView({ product, isOpen, onClose }: QuickViewProps) 
     }, [isOpen]);
 
     if (!product) return null;
+
+    const handleAddToBag = () => {
+        setIsAdded(true);
+        addToCart(product);
+        setTimeout(() => {
+            onClose();
+        }, 800);
+    };
 
     const containerVariants: Variants = {
         hidden: { opacity: 0, scale: 0.95, y: 20 },
@@ -81,20 +91,20 @@ export default function QuickView({ product, isOpen, onClose }: QuickViewProps) 
                         initial="hidden"
                         animate="visible"
                         exit="exit"
-                        className="relative w-full max-w-6xl bg-white shadow-[0_30px_100px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col md:flex-row h-full max-h-[85vh] rounded-sm"
+                        className="relative w-full max-w-6xl bg-white shadow-[0_30px_100px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col md:flex-row h-[90vh] md:h-auto md:max-h-[85vh] rounded-sm"
                     >
                         {/* Close Button */}
                         <motion.button
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={onClose}
-                            className="absolute top-6 right-6 z-20 p-2.5 text-stone-400 hover:text-stone-900 transition-colors bg-white/90 backdrop-blur-md rounded-full border border-stone-100 shadow-sm"
+                            className="absolute top-4 right-4 md:top-6 md:right-6 z-20 p-2.5 text-stone-400 hover:text-stone-900 transition-colors bg-white/90 backdrop-blur-md rounded-full border border-stone-100 shadow-sm"
                         >
                             <X size={18} />
                         </motion.button>
 
                         {/* Image Section */}
-                        <div className="relative flex-1 bg-stone-50 overflow-hidden group h-[400px] md:h-auto">
+                        <div className="relative flex-1 bg-stone-50 overflow-hidden group h-[300px] md:h-auto">
                             {!isImageLoaded && (
                                 <div className="absolute inset-0 bg-stone-100 animate-pulse flex items-center justify-center">
                                     <span className="text-[10px] uppercase tracking-widest text-stone-300">Loading Image...</span>
@@ -111,7 +121,7 @@ export default function QuickView({ product, isOpen, onClose }: QuickViewProps) 
                             />
 
                             {/* Visual Accent */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent pointer-events-none" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
                         </div>
 
                         {/* Content Section */}
@@ -121,7 +131,7 @@ export default function QuickView({ product, isOpen, onClose }: QuickViewProps) 
                                     <motion.div variants={itemVariants} className="space-y-4">
                                         <div className="flex items-center gap-3">
                                             <span className="h-[1px] w-8 bg-stone-200" />
-                                            <span className="text-[10px] uppercase tracking-[0.4em] text-stone-400">Exquisite Collection</span>
+                                            <span className="text-[10px] uppercase tracking-[0.4em] text-stone-400">La Collection Privée</span>
                                         </div>
                                         <h2 className="font-serif text-3xl lg:text-4xl text-stone-900 leading-[1.1] tracking-tight">
                                             {product.title}
@@ -139,7 +149,7 @@ export default function QuickView({ product, isOpen, onClose }: QuickViewProps) 
                                         <div className="grid grid-cols-2 gap-6 pt-4">
                                             <div className="space-y-1">
                                                 <span className="text-[9px] uppercase tracking-widest text-stone-300 block">Identity</span>
-                                                <span className="text-[11px] font-mono text-stone-600">DR-2026-FSH</span>
+                                                <span className="text-[11px] font-mono text-stone-600">DR-2026-MAISON</span>
                                             </div>
                                             <div className="space-y-1">
                                                 <span className="text-[9px] uppercase tracking-widest text-stone-300 block">Origin</span>
@@ -161,16 +171,23 @@ export default function QuickView({ product, isOpen, onClose }: QuickViewProps) 
 
                                     <motion.div variants={itemVariants} className="space-y-4 pt-12 mt-auto">
                                         <motion.button
-                                            whileHover={{ scale: 1.01 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            onClick={() => {
-                                                addToCart(product);
-                                                onClose();
-                                            }}
-                                            className="w-full bg-stone-900 text-white py-5 flex items-center justify-center gap-3 group hover:bg-stone-800 transition-all duration-500 uppercase text-[11px] tracking-[0.25em]"
+                                            whileHover={{ scale: isAdded ? 1 : 1.01 }}
+                                            whileTap={{ scale: isAdded ? 1 : 0.98 }}
+                                            onClick={handleAddToBag}
+                                            disabled={isAdded}
+                                            className={cn(
+                                                "w-full py-5 flex items-center justify-center gap-3 group transition-all duration-500 uppercase text-[11px] tracking-[0.25em]",
+                                                isAdded
+                                                    ? "bg-stone-100 text-stone-400 cursor-default"
+                                                    : "bg-stone-900 text-white hover:bg-stone-800"
+                                            )}
                                         >
-                                            <ShoppingBag size={16} strokeWidth={1.5} />
-                                            Add to Bag
+                                            {isAdded ? (
+                                                <ShieldCheck size={16} strokeWidth={1.5} />
+                                            ) : (
+                                                <ShoppingBag size={16} strokeWidth={1.5} />
+                                            )}
+                                            {isAdded ? "Added to Bag" : "Add to Bag"}
                                         </motion.button>
 
                                         <div className="grid grid-cols-2 gap-4">
