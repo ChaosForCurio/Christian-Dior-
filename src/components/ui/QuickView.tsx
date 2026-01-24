@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { X, ShoppingBag, Heart, Share2, ArrowRight, ShieldCheck, Truck } from 'lucide-react';
 import { Product } from '@/lib/serper';
 import { useEffect, useState } from 'react';
@@ -32,7 +32,7 @@ export default function QuickView({ product, isOpen, onClose }: QuickViewProps) 
 
     if (!product) return null;
 
-    const containerVariants = {
+    const containerVariants: Variants = {
         hidden: { opacity: 0, scale: 0.95, y: 20 },
         visible: {
             opacity: 1,
@@ -53,7 +53,7 @@ export default function QuickView({ product, isOpen, onClose }: QuickViewProps) 
         }
     };
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         hidden: { opacity: 0, y: 15 },
         visible: {
             opacity: 1,

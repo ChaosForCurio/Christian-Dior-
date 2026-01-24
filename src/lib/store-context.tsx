@@ -30,20 +30,26 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 const savedWishlist = localStorage.getItem('dior-wishlist');
 
                 if (savedCart) {
-                    const parsed = JSON.parse(savedCart) as unknown;
-                    if (Array.isArray(parsed) && parsed.length > 0) {
+                    const parsed = JSON.parse(savedCart);
+                    if (Array.isArray(parsed)) {
                         setCart(parsed as Product[]);
+                    } else {
+                        console.warn('[Store] Invalid cart data format in localStorage');
                     }
                 }
 
                 if (savedWishlist) {
-                    const parsed = JSON.parse(savedWishlist) as unknown;
-                    if (Array.isArray(parsed) && parsed.length > 0) {
+                    const parsed = JSON.parse(savedWishlist);
+                    if (Array.isArray(parsed)) {
                         setWishlist(parsed as Product[]);
+                    } else {
+                        console.warn('[Store] Invalid wishlist data format in localStorage');
                     }
                 }
             } catch (error: unknown) {
-                console.error('[Store] Restore Exception:', error instanceof Error ? error.message : String(error));
+                console.error('[Store] Restore Exception:', error instanceof Error ? error.message : 'Unknown error');
+                // Consider clearing corrupted data if needed
+                // localStorage.removeItem('dior-cart');
             }
         };
 
@@ -53,17 +59,21 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     // Save to localStorage on change
     useEffect(() => {
         try {
-            localStorage.setItem('dior-cart', JSON.stringify(cart));
+            if (cart.length >= 0) {
+                localStorage.setItem('dior-cart', JSON.stringify(cart));
+            }
         } catch (error: unknown) {
-            console.error('[Store] Failed to save cart:', error instanceof Error ? error.message : String(error));
+            console.error('[Store] Failed to save cart:', error instanceof Error ? error.message : 'Unknown error');
         }
     }, [cart]);
 
     useEffect(() => {
         try {
-            localStorage.setItem('dior-wishlist', JSON.stringify(wishlist));
+            if (wishlist.length >= 0) {
+                localStorage.setItem('dior-wishlist', JSON.stringify(wishlist));
+            }
         } catch (error: unknown) {
-            console.error('[Store] Failed to save wishlist:', error instanceof Error ? error.message : String(error));
+            console.error('[Store] Failed to save wishlist:', error instanceof Error ? error.message : 'Unknown error');
         }
     }, [wishlist]);
 
