@@ -9,16 +9,18 @@ function generateSpherePoints(count: number, radius: number) {
     const points = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
         const theta = Math.random() * Math.PI * 2;
-        const phi = Math.acos((Math.random() * 2) - 1);
+        // Clamp value to [-1, 1] to avoid NaN from acos
+        const phi = Math.acos(Math.max(-1, Math.min(1, (Math.random() * 2) - 1)));
         const r = Math.cbrt(Math.random()) * radius;
 
         const x = r * Math.sin(phi) * Math.cos(theta);
         const y = r * Math.sin(phi) * Math.sin(theta);
         const z = r * Math.cos(phi);
 
-        points[i * 3] = x;
-        points[i * 3 + 1] = y;
-        points[i * 3 + 2] = z;
+        // Ensure no NaNs propagate
+        points[i * 3] = isNaN(x) ? 0 : x;
+        points[i * 3 + 1] = isNaN(y) ? 0 : y;
+        points[i * 3 + 2] = isNaN(z) ? 0 : z;
     }
     return points;
 }
